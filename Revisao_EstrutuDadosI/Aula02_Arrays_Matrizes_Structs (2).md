@@ -2,11 +2,13 @@
 
 ---
 ```c
+# 1° ex: Ler 10 números, armazenar em um vetor, calcular a soma e a média, e exibir os valores
+
 #include <stdio.h>
 #include <string.h>
 
 int main() {
-    // 1° ex: Ler 10 números, armazenar em um vetor, calcular a soma e a média, e exibir os valores.
+    .
     int m = 0; // Variável para armazenar a média
     int s = 0; // Variável para armazenar a soma dos valores
     int vet[10]; // Declaração de um vetor de 10 posições [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -34,10 +36,12 @@ int main() {
     return 0;
 }
 
+# 2 ex: Ler 10 números, encontrar o maior e o menor valor, e registrar suas respectivas posições (índices).
+
 #include <stdio.h>
 
 int main() {
-    // 2 ex: Ler 10 números, encontrar o maior e o menor valor, e registrar suas respectivas posições (índices).
+    
     int maior_valor = 0; // Armazena o maior número encontrado
     int menor_valor = 0; // Armazena o menor número encontrado
     int pos_maior = 0;   // Guarda a posição (índice) do maior valor
@@ -76,10 +80,12 @@ int main() {
     return 0;
 }
 
+# 3 ex: Ler 20 números, filtrar e exibir apenas os pares, contar quantos são e somá-los.
+
 #include <stdio.h>
 
 int main() {
-    // 3 ex: Ler 20 números, filtrar e exibir apenas os pares, contar quantos são e somá-los.
+    
     int vet[20]; // Vetor para armazenar 20 números
     int c = 0;   // Contador de números pares
     int s = 0;   // Acumulador da soma dos números pares
@@ -109,10 +115,12 @@ int main() {
     return 0;
 }
 
+# 4 ex: Ler 10 valores em um vetor e exibi-los tanto na ordem original quanto na ordem invertida.
+
 #include <stdio.h>
 
 int main() {
-    // 4 ex: Ler 10 valores em um vetor e exibi-los tanto na ordem original quanto na ordem invertida.
+    
     int vet[10]; // Vetor de 10 posições
 
     // Leitura dos 10 valores
@@ -136,10 +144,12 @@ int main() {
     return 0;
 }
 
+# 5 ex: Preencher uma matriz 3x3, calcular a soma total de seus elementos e encontrar o maior valor.
+
 #include <stdio.h>
 
 int main() {
-    // 5 ex: Preencher uma matriz 3x3, calcular a soma total de seus elementos e encontrar o maior valor.
+    
     int s = 0;         // Acumulador para a soma de todos os elementos
     int mat[3][3];     // Matriz de 3 linhas e 3 colunas
     int maior = 0;     // Variável para rastrear o maior valor
@@ -177,10 +187,12 @@ int main() {
     return 0;
 }
 
+#6 ex: Ler uma matriz 4x4, exibir seus elementos e isolar a diagonal principal calculando sua soma.
+
 #include <stdio.h>
 
 int main() {
-    // 6 ex: Ler uma matriz 4x4, exibir seus elementos e isolar a diagonal principal calculando sua soma.
+    
     int s = 0;         // Soma dos elementos da diagonal principal
     int mat[4][4];     // Matriz quadrada 4x4
 
@@ -214,10 +226,12 @@ int main() {
     return 0;
 }
 
+#7 ex: Usar uma matriz 4x3 para armazenar 3 notas de 4 alunos e calcular a média de cada estudante.
+
 #include <stdio.h>
 
 int main() {
-    // 7 ex: Usar uma matriz 4x3 para armazenar 3 notas de 4 alunos e calcular a média de cada estudante.
+    
     int s;
     int m = 0;
     int mat[4][3]; // Matriz 4x3 (4 alunos e 3 notas cada)
@@ -246,6 +260,7 @@ int main() {
     return 0;
 }
 
+#8 ex: Cadastrar 5 produtos usando struct, calcular o valor total em estoque de cada um e achar o maior.
 #include <stdio.h>
 
 // Definição da estrutura para representar um Produto
@@ -257,7 +272,6 @@ struct Produto {
 };
 
 int main() {
-    // 8 ex: Cadastrar 5 produtos usando struct, calcular o valor total em estoque de cada um e achar o maior.
     struct Produto produtos[5]; // Vetor de struct para 5 produtos
 
     // Cadastro dos produtos via teclado
@@ -307,6 +321,8 @@ int main() {
     return 0;
 }
 
+#9 ex: Cadastrar 5 alunos com struct, calcular suas médias, contar aprovados/reprovados e achar a maior média.
+
 #include <stdio.h>
 
 // Definição da estrutura do Aluno
@@ -319,7 +335,6 @@ struct Aluno {
 };
 
 int main() {
-    // 9 ex: Cadastrar 5 alunos com struct, calcular suas médias, contar aprovados/reprovados e achar a maior média.
     struct Aluno alunos[5]; // Vetor de 5 alunos
 
     int aprovados = 0;
@@ -383,6 +398,8 @@ int main() {
     return 0;
 }
 
+#10 ex: Criar um menu interativo com struct para gerenciar funcionários, listar dados, calcular médias e maior salário.
+
 #include <stdio.h>
 
 // Definição da estrutura Funcionario
@@ -394,7 +411,6 @@ struct Funcionario {
 };
 
 int main() {
-    // 10 ex: Criar um menu interativo com struct para gerenciar funcionários, listar dados, calcular médias e maior salário.
     struct Funcionario funcionarios[10]; // Vetor para até 10 funcionários
     int opcao;
 
