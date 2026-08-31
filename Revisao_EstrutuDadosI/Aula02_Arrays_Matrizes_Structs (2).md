@@ -3,6 +3,8 @@
 ---
 
 # Exercício 1: Média e Soma de Elementos em um Vetor
+
+```c
 #include <stdio.h>
 #include <string.h>
 
@@ -29,10 +31,13 @@ int main() {
     
     return 0;
 }
+```
 
 ---
 
 # Exercício 2: Maior e Menor Valor em um Vetor com Posições
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -69,10 +74,13 @@ int main() {
 
     return 0;
 }
+```
 
 ---
 
 # Exercício 3: Filtrar e Somar Números Pares em um Vetor
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -100,10 +108,13 @@ int main() {
  
     return 0;
 }
+```
 
 ---
 
 # Exercício 4: Exibição de Vetor na Ordem Normal e Invertida
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -126,10 +137,13 @@ int main() {
  
     return 0;
 }
+```
 
 ---
 
 # Exercício 5: Maior Valor e Soma em uma Matriz 3x3
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -165,10 +179,13 @@ int main() {
     
     return 0;
 }
+```
 
 ---
 
 # Exercício 6: Diagonal Principal de uma Matriz 4x4
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -201,10 +218,13 @@ int main() {
 
     return 0;
 }
+```
 
 ---
 
 # Exercício 7: Cálculo de Médias de Alunos com Matriz
+
+```c
 #include <stdio.h>
 
 int main() {
@@ -232,10 +252,13 @@ int main() {
 
     return 0;
 }
+```
 
 ---
 
 # Exercício 8: Cadastro de Produtos e Controle de Estoque (Structs)
+
+```c
 #include <stdio.h>
 
 struct Produto {
@@ -290,10 +313,13 @@ int main() {
 
     return 0;
 }
+```
 
 ---
 
 # Exercício 9: Sistema de Gestão de Notas de Alunos
+
+```c
 #include <stdio.h>
 
 struct Aluno {
@@ -362,10 +388,13 @@ int main() {
 
     return 0;
 }
+```
 
 ---
 
 # Exercício 10: Sistema Completo de Gerenciamento de Funcionários (Menu Interativo)
+
+```c
 #include <stdio.h>
 
 struct Funcionario {
@@ -477,3 +506,4 @@ int main() {
 
     return 0;
 }
+```
