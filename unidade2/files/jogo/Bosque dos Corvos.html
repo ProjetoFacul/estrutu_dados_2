@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bosque dos Corvos</title>
+<style>
+:root{
+  --bg:#0f1410; --panel:#161d17; --panel2:#1c2419; --line:#2c3628;
+  --parchment:#ece7da; --dim:#9aa393; --red:#b3372f; --redlite:#d4564c;
+  --black-node:#26302a; --gold:#d3a13b; --bad:#8f3b3b;
+  --font: Georgia, 'Times New Roman', serif;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+body{
+  margin:0; background:var(--bg); color:var(--parchment); font-family:var(--font);
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+  min-height:100%;
+}
+.wrap{max-width:760px; margin:0 auto; padding:28px 18px 60px;}
+header{text-align:center; margin-bottom:18px;}
+h1{font-size:2rem; margin:0 0 4px; letter-spacing:.5px; color:var(--parchment);}
+.sub{color:var(--dim); font-size:.95rem; margin:0;}
+.hud{
+  display:grid; grid-template-columns:repeat(4,1fr); gap:8px; margin:20px 0;
+  background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:12px;
+}
+.hud div{text-align:center;}
+.hud .n{display:block; font-size:1.3rem; color:var(--gold);}
+.hud .l{display:block; font-size:.72rem; color:var(--dim); margin-top:2px;}
+.board{
+  background:var(--panel); border:1px solid var(--line); border-radius:10px;
+  padding:10px; overflow-x:auto; min-height:220px; display:flex; align-items:center; justify-content:center;
+}
+svg{display:block;}
+.node-black circle{fill:var(--black-node); stroke:#3d4a3f; stroke-width:2;}
+.node-red circle{fill:var(--red); stroke:var(--redlite); stroke-width:2;}
+.node text{fill:var(--parchment); font-size:14px; font-family:var(--font); text-anchor:middle; dominant-baseline:central;}
+.edge{stroke:#3a4536; stroke-width:2;}
+.pulse circle{stroke:var(--gold); stroke-width:3; filter:drop-shadow(0 0 5px var(--gold));}
+.empty-msg{color:var(--dim); font-style:italic;}
+.panel{
+  margin-top:16px; background:var(--panel2); border:1px solid var(--line); border-radius:10px;
+  padding:16px; display:none;
+}
+.panel.show{display:block;}
+.panel p{margin:0 0 10px; line-height:1.4;}
+.uncle{display:inline-flex; align-items:center; gap:6px; background:var(--panel); border:1px solid var(--line); border-radius:20px; padding:4px 12px; font-size:.9rem; margin-bottom:12px;}
+.btnrow{display:flex; gap:10px; flex-wrap:wrap;}
+button{
+  font-family:var(--font); font-size:.95rem; padding:10px 16px; border-radius:8px; cursor:pointer;
+  border:1px solid var(--line); background:var(--panel); color:var(--parchment); transition:transform .1s;
+}
+button:hover{transform:translateY(-1px);}
+button:active{transform:translateY(0);}
+.btn-primary{background:var(--gold); color:#211a08; border-color:var(--gold); font-weight:bold;}
+.btn-repintar{background:var(--redlite); border-color:var(--redlite); color:#2a0a08;}
+.btn-realocar{background:#3d4a3f; border-color:#556150;}
+.feedback{margin-top:12px; font-weight:bold; min-height:1.2em;}
+.feedback.ok{color:#7ec98f;}
+.feedback.bad{color:#e08a7d;}
+.controls{margin-top:20px; display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.log{margin-top:16px; font-size:.85rem; color:var(--dim); max-height:110px; overflow-y:auto; border-top:1px solid var(--line); padding-top:8px;}
+.log div{margin-bottom:3px;}
+.overlay{
+  margin-top:20px; text-align:center; padding:22px; border-radius:10px; border:1px solid var(--gold);
+  background:var(--panel2); display:none;
+}
+.overlay.show{display:block;}
+.overlay h2{margin:0 0 8px; color:var(--gold);}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>🐦‍⬛ Bosque dos Corvos</h1>
+<p class="sub">Acomode os filhotes no ninho sem quebrar o equilíbrio rubro-negro.</p>
+</header>
+
+<div class="hud">
+  <div><span class="n" id="hRound">0</span><span class="l">rodada</span></div>
+  <div><span class="n" id="hScore">0</span><span class="l">pontos</span></div>
+  <div><span class="n" id="hViol">0/3</span><span class="l">violações</span></div>
+  <div><span class="n" id="hSize">0/10</span><span class="l">filhotes</span></div>
+</div>
+
+<div class="board" id="board"><span class="empty-msg">O bosque está vazio. Pouse o primeiro filhote.</span></div>
+
+<div class="panel" id="panel">
+  <p>Um filhote pousou e colidiu com seu pai — dois vermelhos em fila. Olhe a cor do tio para decidir o que fazer:</p>
+  <div class="uncle" id="uncleBadge">tio: —</div>
+  <div class="btnrow">
+    <button class="btn-repintar" id="btnRepintar">🎨 Repintar Ninho</button>
+    <button class="btn-realocar" id="btnRealocar">🌿 Realocar Galho</button>
+  </div>
+  <div class="feedback" id="feedback"></div>
+</div>
+
+<div class="overlay" id="overlay">
+  <h2 id="overTitle"></h2>
+  <p id="overText"></p>
+</div>
+
+<div class="controls">
+  <button class="btn-primary" id="btnSpawn">🐦 Pousar próximo filhote</button>
+  <button id="btnRestart" style="display:none;">↺ Nova partida</button>
+</div>
+
+<div class="log" id="log"></div>
+</div>
+
+<script>
+const CFG = {totalChicks:10, violationLimit:3, ptsAction:10, shadeBonus:25, winMult:1.5};
+let tree, score, round, violations, won, lost, usedKeys, pending, spawnInterval;
+
+function newNode(key){ return {key, color:'R', left:null, right:null, parent:null}; }
+
+function resetGame(){
+  tree = {root:null, size:0};
+  score=0; round=0; violations=0; won=false; lost=false; usedKeys=new Set(); pending=null; spawnInterval=3000;
+  document.getElementById('overlay').classList.remove('show');
+  document.getElementById('panel').classList.remove('show');
+  document.getElementById('btnRestart').style.display='none';
+  document.getElementById('btnSpawn').disabled=false;
+  document.getElementById('log').innerHTML='';
+  updateHUD();
+  renderTree();
+}
+
+function insert(key){
+  const n = newNode(key); tree.size++;
+  if(!tree.root){ tree.root=n; n.color='B'; return n; }
+  let cur=tree.root, parent=null;
+  while(cur){ parent=cur; cur = key<cur.key ? cur.left : cur.right; }
+  n.parent=parent;
+  if(key<parent.key) parent.left=n; else parent.right=n;
+  return n;
+}
+function uncleOf(n){
+  if(!n.parent||!n.parent.parent) return null;
+  const gp=n.parent.parent;
+  return n.parent===gp.left ? gp.right : gp.left;
+}
+function hasViolation(n){ return n && n.color==='R' && n.parent && n.parent.color==='R'; }
+function requiredAction(n){
+  const u=uncleOf(n);
+  if(u && u.color==='R') return {kind:'repintar_ninho'};
+  const p=n.parent, gp=p.parent;
+  const leftP = p===gp.left, leftN = n===p.left;
+  return {kind: (leftP===leftN) ? 'realocar_simples' : 'realocar_dupla'};
+}
+function rotateLeft(x){
+  const y=x.right; x.right=y.left; if(y.left) y.left.parent=x;
+  y.parent=x.parent;
+  if(!x.parent) tree.root=y; else if(x===x.parent.left) x.parent.left=y; else x.parent.right=y;
+  y.left=x; x.parent=y;
+}
+function rotateRight(x){
+  const y=x.left; x.left=y.right; if(y.right) y.right.parent=x;
+  y.parent=x.parent;
+  if(!x.parent) tree.root=y; else if(x===x.parent.right) x.parent.right=y; else x.parent.left=y;
+  y.right=x; x.parent=y;
+}
+function applyAction(n, action){
+  const u=uncleOf(n); let p=n.parent; const gp=p.parent;
+  if(action.kind==='repintar_ninho'){ p.color='B'; u.color='B'; gp.color='R'; return gp; }
+  const leftP = p===gp.left;
+  if(leftP){
+    if(action.kind==='realocar_dupla'){ rotateLeft(p); [n,p]=[p,n]; }
+    p.color='B'; gp.color='R'; rotateRight(gp);
+  } else {
+    if(action.kind==='realocar_dupla'){ rotateRight(p); [n,p]=[p,n]; }
+    p.color='B'; gp.color='R'; rotateLeft(gp);
+  }
+  return n;
+}
+function blackHeights(){
+  const hs=[]; 
+  (function walk(node,bh){
+    if(!node){ hs.push(bh+1); return; }
+    const b=bh+(node.color==='B'?1:0);
+    walk(node.left,b); walk(node.right,b);
+  })(tree.root,0);
+  return hs;
+}
+function isShadeBalanced(){ if(!tree.root) return true; return new Set(blackHeights()).size===1; }
+function hasAnyViolation(){
+  let found=false;
+  (function walk(n){ if(!n) return; if(hasViolation(n)) found=true; walk(n.left); walk(n.right); })(tree.root);
+  return found;
+}
+function isValidRB(){
+  if(!tree.root) return true;
+  if(tree.root.color!=='B') return false;
+  if(hasAnyViolation()) return false;
+  return isShadeBalanced();
+}
+function inorderKeys(){ const r=[]; (function w(n){ if(!n) return; w(n.left); r.push(n.key); w(n.right); })(tree.root); return r; }
+function collapseToChain(){
+  const keys=inorderKeys().sort((a,b)=>a-b);
+  tree.root=null; tree.size=0; let cur=null;
+  keys.forEach(k=>{
+    const n=newNode(k); n.color='B'; tree.size++;
+    if(!tree.root) tree.root=n; else { cur.right=n; n.parent=cur; }
+    cur=n;
+  });
+}
+function treeHeight(){ return (function h(n){ return n? 1+Math.max(h(n.left),h(n.right)) : 0; })(tree.root); }
+
+function updateHUD(){
+  document.getElementById('hRound').textContent=round;
+  document.getElementById('hScore').textContent=score;
+  document.getElementById('hViol').textContent=violations+'/'+CFG.violationLimit;
+  document.getElementById('hSize').textContent=tree.size+'/'+CFG.totalChicks;
+}
+function addLog(msg){
+  const l=document.getElementById('log'); const d=document.createElement('div'); d.textContent=msg; l.prepend(d);
+}
+
+function renderTree(){
+  const container=document.getElementById('board');
+  if(!tree.root){ container.innerHTML='<span class="empty-msg">O bosque está vazio. Pouse o primeiro filhote.</span>'; return; }
+  const order=[]; (function w(n,d){ if(!n) return; w(n.left,d+1); order.push({n,d}); w(n.right,d+1); })(tree.root,0);
+  const xIdx=new Map(); order.forEach((o,i)=>xIdx.set(o.n,i));
+  const HS=54, VS=64, M=30;
+  const maxDepth = Math.max(...order.map(o=>o.d));
+  const w = order.length*HS + M*2, h=(maxDepth+1)*VS + M*2;
+  let edges='', nodes='';
+  order.forEach(({n,d})=>{
+    const x=xIdx.get(n)*HS+M+HS/2, y=d*VS+M+20;
+    if(n.parent){
+      const px=xIdx.get(n.parent)*HS+M+HS/2, py = (d-1)*VS+M+20;
+      edges += `<line class="edge" x1="${px}" y1="${py}" x2="${x}" y2="${y}"/>`;
+    }
+    const cls = 'node ' + (n.color==='R'?'node-red':'node-black') + (n===pending?' pulse':'');
+    nodes += `<g class="${cls}"><circle cx="${x}" cy="${y}" r="20"/><text x="${x}" y="${y}">${n.key}</text></g>`;
+  });
+  container.innerHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${edges}${nodes}</svg>`;
+}
+
+function spawnChick(){
+  if(won||lost) return;
+  round++;
+  let key; do{ key=1+Math.floor(Math.random()*99); }while(usedKeys.has(key));
+  usedKeys.add(key);
+  pending = insert(key);
+  addLog('Rodada '+round+': o filhote #'+key+' pousou no bosque.');
+  document.getElementById('btnSpawn').disabled=true;
+  renderTree(); updateHUD();
+  processViolation();
+}
+
+function processViolation(){
+  if(!pending || !hasViolation(pending)){
+    finishRound(); return;
+  }
+  const req = requiredAction(pending);
+  const u = uncleOf(pending);
+  const uncleColor = u ? (u.color==='R'?'🔴 vermelho':'⚫ preto') : '⚫ ausente (preto)';
+  document.getElementById('uncleBadge').textContent = 'tio do filhote #'+pending.key+': '+uncleColor;
+  document.getElementById('feedback').textContent='';
+  document.getElementById('panel').classList.add('show');
+  document.getElementById('panel').dataset.required = req.kind;
+}
+
+function chooseAction(playerChoice){
+  const req = requiredAction(pending);
+  const reqCategory = req.kind==='repintar_ninho' ? 'repintar' : 'realocar';
+  const correct = playerChoice===reqCategory;
+  const fb=document.getElementById('feedback');
+  const resultNode = applyAction(pending, req);
+  if(correct){
+    score += CFG.ptsAction;
+    fb.textContent='Correto! +'+CFG.ptsAction+' pontos.';
+    fb.className='feedback ok';
+    addLog('Ação certa: '+(reqCategory==='repintar'?'repintar ninho':'realocar galho')+' (+'+CFG.ptsAction+').');
+  } else {
+    violations++;
+    fb.textContent='Escolha errada — o galho racha, mas o bosque se ajusta sozinho.';
+    fb.className='feedback bad';
+    addLog('Ação errada. Violações: '+violations+'/'+CFG.violationLimit+'.');
+    if(violations>=CFG.violationLimit){
+      collapseToChain(); lost=true;
+      updateHUD(); renderTree();
+      document.getElementById('panel').classList.remove('show');
+      endGame(); return;
+    }
+  }
+  pending = resultNode;
+  updateHUD(); renderTree();
+  setTimeout(processViolation, 550);
+}
+
+function finishRound(){
+  document.getElementById('panel').classList.remove('show');
+  if(tree.root) tree.root.color='B';
+  const shadeOk = isShadeBalanced();
+  if(shadeOk && !lost){ score += CFG.shadeBonus; addLog('Dossel equilibrado! +'+CFG.shadeBonus+' de equilíbrio de sombra.'); }
+  spawnInterval = Math.max(700, Math.floor(spawnInterval*0.9));
+  renderTree(); updateHUD();
+  if(tree.size>=CFG.totalChicks && isValidRB()){
+    won=true; score=Math.floor(score*CFG.winMult);
+    updateHUD(); endGame();
+  } else {
+    document.getElementById('btnSpawn').disabled=false;
+  }
+}
+
+function endGame(){
+  document.getElementById('btnSpawn').disabled=true;
+  document.getElementById('btnRestart').style.display='inline-block';
+  const ov=document.getElementById('overlay');
+  ov.classList.add('show');
+  if(won){
+    document.getElementById('overTitle').textContent='🌲 O bosque floresceu!';
+    document.getElementById('overText').textContent = tree.size+' filhotes acomodados, propriedade rubro-negra íntegra. Pontuação final: '+score+'.';
+  } else {
+    document.getElementById('overTitle').textContent='🥀 O bosque colapsou';
+    document.getElementById('overText').textContent = 'Violações demais sem correção — os ninhos degeneraram numa única fileira (altura '+treeHeight()+' para '+tree.size+' filhotes). Pontuação final: '+score+'.';
+  }
+}
+
+document.getElementById('btnSpawn').addEventListener('click', spawnChick);
+document.getElementById('btnRestart').addEventListener('click', resetGame);
+document.getElementById('btnRepintar').addEventListener('click', ()=>chooseAction('repintar'));
+document.getElementById('btnRealocar').addEventListener('click', ()=>chooseAction('realocar'));
+
+resetGame();
+</script>
+</body>
+</html>
